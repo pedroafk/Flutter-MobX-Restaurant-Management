@@ -50,7 +50,7 @@ class Modal extends StatelessWidget {
                         ?.copyWith(fontWeight: FontWeight.w400)),
             const CloseButton(
               style: ButtonStyle(
-                side: MaterialStatePropertyAll(BorderSide.none),
+                side: WidgetStatePropertyAll(BorderSide.none),
               ),
             ),
           ],

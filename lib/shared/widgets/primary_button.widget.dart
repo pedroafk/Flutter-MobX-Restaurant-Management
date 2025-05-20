@@ -72,9 +72,7 @@ class PrimaryButton extends StatelessWidget {
         var svg = SvgPicture.asset(
           appIcon!,
           width: iconSize?.width ?? (dense ? 16 : 18),
-          colorFilter: isDisabled
-              ? const ColorFilter.mode(Colors.grey, BlendMode.srcIn)
-              : null,
+          colorFilter: isDisabled ? const ColorFilter.mode(Colors.grey, BlendMode.srcIn) : null,
         );
         return Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -95,39 +93,34 @@ class PrimaryButton extends StatelessWidget {
     var btnStyle = ButtonStyle(
       fixedSize: width == null
           ? null
-          : MaterialStateProperty.all<Size>(
+          : WidgetStateProperty.all<Size>(
               Size.fromWidth(width!),
             ),
-      padding: MaterialStateProperty.all<EdgeInsets>(
+      padding: WidgetStateProperty.all<EdgeInsets>(
         EdgeInsets.only(
           top: dense ? 10 : 20,
           bottom: dense ? 10 : 20,
           left: horizontalPadding ??
-              ((appIcon != null && !iconToRight)
-                  ? (dense ? 12 : 22)
-                  : (dense ? 16 : 24)),
+              ((appIcon != null && !iconToRight) ? (dense ? 12 : 22) : (dense ? 16 : 24)),
           right: horizontalPadding ??
-              ((appIcon != null && iconToRight)
-                  ? (dense ? 12 : 22)
-                  : (dense ? 16 : 24)),
+              ((appIcon != null && iconToRight) ? (dense ? 12 : 22) : (dense ? 16 : 24)),
         ),
       ),
     );
 
     if (color != null) {
       btnStyle = btnStyle.copyWith(
-        // foregroundColor: MaterialStateProperty.all<Color>(Colors.grey),
-        backgroundColor: MaterialStateProperty.all<Color>(color!),
+        // foregroundColor: WidgetStateProperty.all<Color>(Colors.grey),
+        backgroundColor: WidgetStateProperty.all<Color>(color!),
       );
     }
 
     if (isDisabled) {
       btnStyle = btnStyle.copyWith(
-        // foregroundColor: MaterialStateProperty.all<Color>(Colors.grey),
-        backgroundColor: MaterialStateProperty.all<Color>(Colors.grey.shade100),
-        side: MaterialStateProperty.all<BorderSide>(
-            BorderSide(color: Colors.grey.shade100)),
-        overlayColor: MaterialStateProperty.all<Color>(Colors.transparent),
+        // foregroundColor: WidgetStateProperty.all<Color>(Colors.grey),
+        backgroundColor: WidgetStateProperty.all<Color>(Colors.grey.shade100),
+        side: WidgetStateProperty.all<BorderSide>(BorderSide(color: Colors.grey.shade100)),
+        overlayColor: WidgetStateProperty.all<Color>(Colors.transparent),
       );
     }
 

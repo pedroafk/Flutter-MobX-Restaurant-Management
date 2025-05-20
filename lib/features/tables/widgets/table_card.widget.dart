@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:teste_flutter/features/tables/widgets/customers_counter.widget.dart';
+import 'package:teste_flutter/features/tables/widgets/edit_table_dialog.dart';
 import 'package:teste_flutter/utils/extension_methos/material_extensions_methods.dart';
 
 const double _innerPadding = 1.0;
@@ -8,13 +9,15 @@ const double _topPadding = 5.0;
 class TableCard extends StatelessWidget {
   const TableCard({
     super.key,
+    required this.tableNumber,
   });
+
+  final int tableNumber;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(
-          _innerPadding, _topPadding, _innerPadding, _innerPadding),
+      padding: const EdgeInsets.fromLTRB(_innerPadding, _topPadding, _innerPadding, _innerPadding),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         color: context.appColors.lightGreen,
@@ -25,9 +28,8 @@ class TableCard extends StatelessWidget {
         children: [
           Center(
             child: Text(('{identification}').toUpperCase(),
-                style: context.textTheme.bodyMedium?.copyWith(
-                    color: context.appColors.green,
-                    fontWeight: FontWeight.w500)),
+                style: context.textTheme.bodyMedium
+                    ?.copyWith(color: context.appColors.green, fontWeight: FontWeight.w500)),
           ),
           const SizedBox(height: _innerPadding),
           Card(
@@ -38,7 +40,10 @@ class TableCard extends StatelessWidget {
             ),
             child: InkWell(
               onTap: () {
-                debugPrint('editar mesa');
+                showDialog(
+                  context: context,
+                  builder: (context) => EditTableDialog(tableNumber: tableNumber),
+                );
               },
               child: Padding(
                 padding: const EdgeInsets.all(10),
@@ -47,8 +52,8 @@ class TableCard extends StatelessWidget {
                     label: '{sum_customers}',
                     iconWidth: 16,
                     color: context.appColors.darkGrey,
-                    textStyle: context.textTheme.bodySmall
-                        ?.copyWith(color: context.appColors.darkGrey),
+                    textStyle:
+                        context.textTheme.bodySmall?.copyWith(color: context.appColors.darkGrey),
                   )
                 ]),
               ),
