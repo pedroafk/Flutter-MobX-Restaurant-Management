@@ -15,7 +15,7 @@ class CreateTableDialog extends StatefulWidget {
 class _CreateTableDialogState extends State<CreateTableDialog> {
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
-  final CreateTableStore store = CreateTableStore();
+  final CreateTableStore createTableStore = CreateTableStore();
 
   @override
   void dispose() {
@@ -62,7 +62,7 @@ class _CreateTableDialogState extends State<CreateTableDialog> {
                 labelText: 'Nome + Sobrenome',
                 border: OutlineInputBorder(),
               ),
-              onChanged: store.setName,
+              onChanged: createTableStore.setName,
             ),
             const SizedBox(height: 20),
             TextField(
@@ -79,7 +79,7 @@ class _CreateTableDialogState extends State<CreateTableDialog> {
                   text: formatted,
                   selection: TextSelection.collapsed(offset: formatted.length),
                 );
-                store.setPhone(formatted);
+                createTableStore.setPhone(formatted);
               },
             ),
             const SizedBox(height: 20),
@@ -108,13 +108,13 @@ class _CreateTableDialogState extends State<CreateTableDialog> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF1FB76C),
                       ),
-                      onPressed: store.name.isNotEmpty &&
-                              store.phone.isNotEmpty &&
-                              store.phone.length == 15
+                      onPressed: createTableStore.name.isNotEmpty &&
+                              createTableStore.phone.isNotEmpty &&
+                              createTableStore.phone.length == 15
                           ? () {
                               widget.tablesStore.addTable(
-                                store.name,
-                                store.phone,
+                                createTableStore.name,
+                                createTableStore.phone,
                               );
                               Navigator.of(context).pop();
                             }

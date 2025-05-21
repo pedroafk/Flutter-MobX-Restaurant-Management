@@ -6,9 +6,9 @@ import 'package:teste_flutter/features/tables/stores/edit_table_customers_store.
 import 'package:teste_flutter/features/tables/stores/edit_table_store.dart';
 
 class EditTableDialog extends StatefulWidget {
-  const EditTableDialog({super.key, required this.table});
+  const EditTableDialog({super.key, required this.tableEntity});
 
-  final TableEntity table;
+  final TableEntity tableEntity;
 
   @override
   State<EditTableDialog> createState() => _EditTableDialogState();
@@ -21,7 +21,7 @@ class _EditTableDialogState extends State<EditTableDialog> {
   void initState() {
     super.initState();
     _helper = EditTableDialogHelper(
-      table: widget.table,
+      table: widget.tableEntity,
       editTableStore: EditTableStore(),
       customersStore: EditTableCustomersStore(),
     );
@@ -51,7 +51,7 @@ class _EditTableDialogState extends State<EditTableDialog> {
                 mainAxisSize: MainAxisSize.max,
                 children: [
                   Text(
-                    'Editar informações da mesa ${widget.table.id}',
+                    'Editar informações da mesa ${widget.tableEntity.id}',
                     style: const TextStyle(
                       fontWeight: FontWeight.normal,
                       fontSize: 20,
@@ -67,10 +67,11 @@ class _EditTableDialogState extends State<EditTableDialog> {
               ),
               const SizedBox(height: 20),
               TextField(
+                controller: _helper.tableIdentifierController,
                 keyboardType: TextInputType.name,
-                decoration: InputDecoration(
-                  labelText: 'Mesa de ${widget.table.identification}',
-                  border: const OutlineInputBorder(),
+                decoration: const InputDecoration(
+                  labelText: 'Identificação da mesa',
+                  border: OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 10),
@@ -215,19 +216,23 @@ class _EditTableDialogState extends State<EditTableDialog> {
                     ),
                   ),
                   const SizedBox(width: 20),
-                  SizedBox(
-                    height: 40,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF1FB76C),
-                      ),
-                      child: const Text(
-                        'Criar',
-                        style: TextStyle(
-                          color: Colors.white,
+                  Observer(
+                    builder: (_) => SizedBox(
+                      height: 40,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF1FB76C),
                         ),
+                        child: const Text(
+                          'Criar',
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
                       ),
-                      onPressed: () {},
                     ),
                   ),
                 ],
