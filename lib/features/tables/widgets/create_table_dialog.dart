@@ -102,7 +102,10 @@ class _CreateTableDialogState extends State<CreateTableDialog> {
                       ),
                       onPressed: store.name.isNotEmpty && store.phone.isNotEmpty
                           ? () {
-                              widget.tablesStore.addTable();
+                              widget.tablesStore.addTable(
+                                store.name,
+                                store.phone,
+                              );
                               Navigator.of(context).pop();
                             }
                           : null,

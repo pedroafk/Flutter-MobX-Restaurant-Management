@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:teste_flutter/features/tables/entities/table.entity.dart';
 import 'package:teste_flutter/features/tables/widgets/customers_counter.widget.dart';
 import 'package:teste_flutter/features/tables/widgets/edit_table_dialog.dart';
 import 'package:teste_flutter/utils/extension_methos/material_extensions_methods.dart';
@@ -9,10 +10,10 @@ const double _topPadding = 5.0;
 class TableCard extends StatelessWidget {
   const TableCard({
     super.key,
-    required this.tableNumber,
+    required this.table,
   });
 
-  final int tableNumber;
+  final TableEntity table;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +28,7 @@ class TableCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Center(
-            child: Text(('Mesa $tableNumber').toUpperCase(),
+            child: Text(('Mesa ${table.id}').toUpperCase(),
                 style: context.textTheme.bodyMedium
                     ?.copyWith(color: context.appColors.green, fontWeight: FontWeight.w500)),
           ),
@@ -42,14 +43,16 @@ class TableCard extends StatelessWidget {
               onTap: () {
                 showDialog(
                   context: context,
-                  builder: (context) => EditTableDialog(tableNumber: tableNumber),
+                  builder: (context) => EditTableDialog(table: table),
                 );
               },
               child: Padding(
                 padding: const EdgeInsets.all(10),
                 child: Column(children: [
                   CustomersCounter(
-                    label: '{sum_customers}',
+                    label: table.customers.length <= 1
+                        ? 'Total de ${table.customers.length} cliente'
+                        : 'Total de ${table.customers.length} clientes',
                     iconWidth: 16,
                     color: context.appColors.darkGrey,
                     textStyle:
