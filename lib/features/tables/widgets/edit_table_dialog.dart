@@ -1,10 +1,52 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:mobx/mobx.dart';
 import 'package:teste_flutter/features/tables/entities/table.entity.dart';
+import 'package:teste_flutter/features/tables/stores/edit_table_store.dart';
 
-class EditTableDialog extends StatelessWidget {
+class EditTableDialog extends StatefulWidget {
   const EditTableDialog({super.key, required this.table});
 
   final TableEntity table;
+
+  @override
+  State<EditTableDialog> createState() => _EditTableDialogState();
+}
+
+class _EditTableDialogState extends State<EditTableDialog> {
+  TextEditingController _quantityController = TextEditingController();
+  final EditTableStore store = EditTableStore();
+
+  late ReactionDisposer _disposer;
+
+  @override
+  void initState() {
+    super.initState();
+    final initialQuantity = widget.table.customers.isNotEmpty ? widget.table.customers.length : 1;
+    store.setQuantity(initialQuantity);
+    _quantityController = TextEditingController(text: initialQuantity.toString());
+
+    _quantityController.addListener(() {
+      final value = int.tryParse(_quantityController.text) ?? 1;
+      store.setQuantity(value);
+    });
+
+    _disposer = reaction<int>(
+      (_) => store.quantity,
+      (value) {
+        if (_quantityController.text != value.toString()) {
+          _quantityController.text = value.toString();
+        }
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _disposer();
+    _quantityController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +65,7 @@ class EditTableDialog extends StatelessWidget {
                 mainAxisSize: MainAxisSize.max,
                 children: [
                   Text(
-                    'Editar informações da mesa ${table.identification}',
+                    'Editar informações da mesa ${widget.table.id}',
                     style: const TextStyle(
                       fontWeight: FontWeight.normal,
                       fontSize: 20,
@@ -38,11 +80,11 @@ class EditTableDialog extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 20),
-              const TextField(
+              TextField(
                 keyboardType: TextInputType.name,
                 decoration: InputDecoration(
-                  labelText: 'Identificação da mesa',
-                  border: OutlineInputBorder(),
+                  labelText: 'Mesa de ${widget.table.identification}',
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 10),
@@ -73,60 +115,78 @@ class EditTableDialog extends StatelessWidget {
                 children: [
                   Expanded(
                     child: TextFormField(
+                      controller: _quantityController,
+                      enabled: false,
+                      style: const TextStyle(
+                        color: Colors.black,
+                      ),
                       decoration: const InputDecoration(
                         labelText: 'Quantidade de pessoas',
                         border: OutlineInputBorder(),
+                        disabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.black26),
+                        ),
                       ),
                     ),
                   ),
                   const SizedBox(width: 10),
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      int currentValue = int.tryParse(_quantityController.text) ?? 1;
+                      if (currentValue > 1) {
+                        _quantityController.text = (currentValue - 1).toString();
+                      }
+                    },
                     icon: const Icon(Icons.remove),
                   ),
                   const SizedBox(width: 10),
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      _quantityController.text =
+                          (int.parse(_quantityController.text) + 1).toString();
+                    },
                     icon: const Icon(Icons.add),
                   ),
                 ],
               ),
               const SizedBox(height: 20),
-              ListView.builder(
-                itemCount: 3,
-                shrinkWrap: true,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 20),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            decoration: InputDecoration(
-                              prefixIcon: const Icon(Icons.person_outlined),
-                              labelText: 'Cliente ${index + 1}',
-                              border: const OutlineInputBorder(),
-                              contentPadding:
-                                  const EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
+              Observer(
+                builder: (_) => ListView.builder(
+                  itemCount: store.quantity,
+                  shrinkWrap: true,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 20),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              decoration: InputDecoration(
+                                prefixIcon: const Icon(Icons.person_outlined),
+                                labelText: widget.table.customers[index].name,
+                                border: const OutlineInputBorder(),
+                                contentPadding:
+                                    const EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 10),
-                        const Expanded(
-                          child: TextField(
-                            decoration: InputDecoration(
-                              prefixIcon: Icon(Icons.phone_outlined),
-                              labelText: 'Telefone',
-                              border: OutlineInputBorder(),
-                              contentPadding:
-                                  EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: TextField(
+                              decoration: InputDecoration(
+                                prefixIcon: const Icon(Icons.phone_outlined),
+                                labelText: widget.table.customers[index].phone,
+                                border: const OutlineInputBorder(),
+                                contentPadding:
+                                    const EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ),
               const SizedBox(height: 20),
               const TextField(
