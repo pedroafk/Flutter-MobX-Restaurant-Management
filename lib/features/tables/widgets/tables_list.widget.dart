@@ -21,7 +21,7 @@ class TablesList extends StatelessWidget {
               runSpacing: 10,
               children: store.tables
                   .map(
-                    (e) => TableCard(tableNumber: e),
+                    (e) => TableCard(table: e),
                   )
                   .toList(),
             ),

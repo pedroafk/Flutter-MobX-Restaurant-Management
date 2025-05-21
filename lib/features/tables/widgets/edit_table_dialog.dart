@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:teste_flutter/features/tables/entities/table.entity.dart';
 
 class EditTableDialog extends StatelessWidget {
-  const EditTableDialog({super.key, required this.tableNumber});
+  const EditTableDialog({super.key, required this.table});
 
-  final int tableNumber;
+  final TableEntity table;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +23,7 @@ class EditTableDialog extends StatelessWidget {
                 mainAxisSize: MainAxisSize.max,
                 children: [
                   Text(
-                    'Editar informações da mesa $tableNumber',
+                    'Editar informações da mesa ${table.identification}',
                     style: const TextStyle(
                       fontWeight: FontWeight.normal,
                       fontSize: 20,
