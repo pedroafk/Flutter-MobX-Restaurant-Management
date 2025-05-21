@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx/mobx.dart';
 import 'package:teste_flutter/features/tables/entities/table.entity.dart';
+import 'package:teste_flutter/features/tables/stores/edit_table_customers_store.dart';
 import 'package:teste_flutter/features/tables/stores/edit_table_store.dart';
 
 class EditTableDialog extends StatefulWidget {
@@ -15,24 +16,26 @@ class EditTableDialog extends StatefulWidget {
 
 class _EditTableDialogState extends State<EditTableDialog> {
   TextEditingController _quantityController = TextEditingController();
-  final EditTableStore store = EditTableStore();
+  final EditTableStore editTableStore = EditTableStore();
+  final EditTableCustomersStore customersStore = EditTableCustomersStore();
 
   late ReactionDisposer _disposer;
 
   @override
   void initState() {
     super.initState();
+    customersStore.setCustomers(widget.table.customers);
     final initialQuantity = widget.table.customers.isNotEmpty ? widget.table.customers.length : 1;
-    store.setQuantity(initialQuantity);
+    editTableStore.setQuantity(initialQuantity);
     _quantityController = TextEditingController(text: initialQuantity.toString());
 
     _quantityController.addListener(() {
       final value = int.tryParse(_quantityController.text) ?? 1;
-      store.setQuantity(value);
+      editTableStore.setQuantity(value);
     });
 
     _disposer = reaction<int>(
-      (_) => store.quantity,
+      (_) => editTableStore.quantity,
       (value) {
         if (_quantityController.text != value.toString()) {
           _quantityController.text = value.toString();
@@ -132,9 +135,11 @@ class _EditTableDialogState extends State<EditTableDialog> {
                   const SizedBox(width: 10),
                   IconButton(
                     onPressed: () {
-                      int currentValue = int.tryParse(_quantityController.text) ?? 1;
-                      if (currentValue > 1) {
-                        _quantityController.text = (currentValue - 1).toString();
+                      if (customersStore.customers.length > 1) {
+                        setState(() {
+                          customersStore.removeLastCustomer();
+                          _quantityController.text = customersStore.customers.length.toString();
+                        });
                       }
                     },
                     icon: const Icon(Icons.remove),
@@ -142,8 +147,10 @@ class _EditTableDialogState extends State<EditTableDialog> {
                   const SizedBox(width: 10),
                   IconButton(
                     onPressed: () {
-                      _quantityController.text =
-                          (int.parse(_quantityController.text) + 1).toString();
+                      setState(() {
+                        customersStore.addCustomer();
+                        _quantityController.text = customersStore.customers.length.toString();
+                      });
                     },
                     icon: const Icon(Icons.add),
                   ),
@@ -152,33 +159,39 @@ class _EditTableDialogState extends State<EditTableDialog> {
               const SizedBox(height: 20),
               Observer(
                 builder: (_) => ListView.builder(
-                  itemCount: store.quantity,
+                  itemCount: customersStore.customers.length,
                   shrinkWrap: true,
                   itemBuilder: (context, index) {
+                    final customer = customersStore.customers[index];
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 20),
                       child: Row(
                         children: [
                           Expanded(
                             child: TextField(
-                              decoration: InputDecoration(
-                                prefixIcon: const Icon(Icons.person_outlined),
-                                labelText: widget.table.customers[index].name,
-                                border: const OutlineInputBorder(),
+                              controller: TextEditingController(text: customer.name),
+                              onChanged: (value) => customersStore.updateCustomerName(index, value),
+                              decoration: const InputDecoration(
+                                prefixIcon: Icon(Icons.person_outlined),
+                                labelText: 'Nome',
+                                border: OutlineInputBorder(),
                                 contentPadding:
-                                    const EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
+                                    EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
                               ),
                             ),
                           ),
                           const SizedBox(width: 10),
                           Expanded(
                             child: TextField(
-                              decoration: InputDecoration(
-                                prefixIcon: const Icon(Icons.phone_outlined),
-                                labelText: widget.table.customers[index].phone,
-                                border: const OutlineInputBorder(),
+                              controller: TextEditingController(text: customer.phone),
+                              onChanged: (value) =>
+                                  customersStore.updateCustomerPhone(index, value),
+                              decoration: const InputDecoration(
+                                prefixIcon: Icon(Icons.phone_outlined),
+                                labelText: 'Telefone',
+                                border: OutlineInputBorder(),
                                 contentPadding:
-                                    const EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
+                                    EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
                               ),
                             ),
                           ),

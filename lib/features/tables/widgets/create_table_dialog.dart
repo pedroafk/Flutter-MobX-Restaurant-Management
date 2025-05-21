@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:teste_flutter/features/tables/stores/create_table_store.dart';
 import 'package:teste_flutter/features/tables/stores/tables_store.dart';
+import 'package:teste_flutter/features/tables/utils/phone_utils.dart';
 
 class CreateTableDialog extends StatefulWidget {
   const CreateTableDialog({super.key, required this.tablesStore});
@@ -72,7 +73,14 @@ class _CreateTableDialogState extends State<CreateTableDialog> {
                 border: OutlineInputBorder(),
                 hintText: "(99) 99999-9999",
               ),
-              onChanged: store.setPhone,
+              onChanged: (value) {
+                String formatted = formatPhone(value);
+                _phoneController.value = TextEditingValue(
+                  text: formatted,
+                  selection: TextSelection.collapsed(offset: formatted.length),
+                );
+                store.setPhone(formatted);
+              },
             ),
             const SizedBox(height: 20),
             Row(
@@ -100,7 +108,9 @@ class _CreateTableDialogState extends State<CreateTableDialog> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF1FB76C),
                       ),
-                      onPressed: store.name.isNotEmpty && store.phone.isNotEmpty
+                      onPressed: store.name.isNotEmpty &&
+                              store.phone.isNotEmpty &&
+                              store.phone.length == 15
                           ? () {
                               widget.tablesStore.addTable(
                                 store.name,
