@@ -27,7 +27,7 @@ class TableCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Center(
-            child: Text(('{identification}').toUpperCase(),
+            child: Text(('Mesa $tableNumber').toUpperCase(),
                 style: context.textTheme.bodyMedium
                     ?.copyWith(color: context.appColors.green, fontWeight: FontWeight.w500)),
           ),
