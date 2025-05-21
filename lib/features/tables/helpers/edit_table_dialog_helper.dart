@@ -10,6 +10,8 @@ class EditTableDialogHelper {
   final EditTableCustomersStore customersStore;
 
   late TextEditingController quantityController;
+  late TextEditingController tableIdentifierController;
+
   late ReactionDisposer disposer;
 
   EditTableDialogHelper({
@@ -26,11 +28,13 @@ class EditTableDialogHelper {
     editTableStore.setQuantity(initialQuantity);
 
     quantityController = TextEditingController(text: initialQuantity.toString());
+    tableIdentifierController = TextEditingController(text: table.identification);
 
     quantityController.addListener(() {
       final value = int.tryParse(quantityController.text) ?? 1;
       editTableStore.setQuantity(value);
     });
+
     disposer = reaction<int>(
       (_) => editTableStore.quantity,
       (value) {
@@ -44,5 +48,6 @@ class EditTableDialogHelper {
   void dispose() {
     disposer();
     quantityController.dispose();
+    tableIdentifierController.dispose();
   }
 }

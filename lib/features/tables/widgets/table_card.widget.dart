@@ -43,7 +43,7 @@ class TableCard extends StatelessWidget {
               onTap: () {
                 showDialog(
                   context: context,
-                  builder: (context) => EditTableDialog(table: table),
+                  builder: (context) => EditTableDialog(tableEntity: table),
                 );
               },
               child: Padding(
