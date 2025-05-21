@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:teste_flutter/features/tables/stores/tables_store.dart';
 import 'package:teste_flutter/features/tables/widgets/create_table_dialog.dart';
 import 'package:teste_flutter/features/tables/widgets/customers_counter.widget.dart';
 import 'package:teste_flutter/shared/widgets/search_input.widget.dart';
@@ -28,9 +30,10 @@ class TablesHeader extends StatelessWidget {
             const SizedBox(width: 20),
             FloatingActionButton(
               onPressed: () {
+                final tablesStore = Provider.of<TablesStore>(context, listen: false);
                 showDialog(
                   context: context,
-                  builder: (context) => const CreateTableDialog(),
+                  builder: (context) => CreateTableDialog(tablesStore: tablesStore),
                 );
               },
               tooltip: 'Criar nova mesa',

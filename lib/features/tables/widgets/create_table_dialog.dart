@@ -1,7 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:teste_flutter/features/tables/stores/create_table_store.dart';
+import 'package:teste_flutter/features/tables/stores/tables_store.dart';
 
-class CreateTableDialog extends StatelessWidget {
-  const CreateTableDialog({super.key});
+class CreateTableDialog extends StatefulWidget {
+  const CreateTableDialog({super.key, required this.tablesStore});
+  final TablesStore tablesStore;
+
+  @override
+  State<CreateTableDialog> createState() => _CreateTableDialogState();
+}
+
+class _CreateTableDialogState extends State<CreateTableDialog> {
+  final _nameController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final CreateTableStore store = CreateTableStore();
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _phoneController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,21 +54,25 @@ class CreateTableDialog extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 20),
-            const TextField(
+            TextField(
+              controller: _nameController,
               keyboardType: TextInputType.name,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Nome + Sobrenome',
                 border: OutlineInputBorder(),
               ),
+              onChanged: store.setName,
             ),
             const SizedBox(height: 20),
-            const TextField(
+            TextField(
+              controller: _phoneController,
               keyboardType: TextInputType.phone,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Telefone',
                 border: OutlineInputBorder(),
                 hintText: "(99) 99999-9999",
               ),
+              onChanged: store.setPhone,
             ),
             const SizedBox(height: 20),
             Row(
@@ -69,19 +93,26 @@ class CreateTableDialog extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 20),
-                SizedBox(
-                  height: 40,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF1FB76C),
-                    ),
-                    child: const Text(
-                      'Criar',
-                      style: TextStyle(
-                        color: Colors.white,
+                Observer(
+                  builder: (_) => SizedBox(
+                    height: 40,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF1FB76C),
+                      ),
+                      onPressed: store.name.isNotEmpty && store.phone.isNotEmpty
+                          ? () {
+                              widget.tablesStore.addTable();
+                              Navigator.of(context).pop();
+                            }
+                          : null,
+                      child: const Text(
+                        'Criar',
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
                       ),
                     ),
-                    onPressed: () {},
                   ),
                 ),
               ],
