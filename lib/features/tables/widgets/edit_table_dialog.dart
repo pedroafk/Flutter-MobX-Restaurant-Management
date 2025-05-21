@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:mobx/mobx.dart';
 import 'package:teste_flutter/features/tables/entities/table.entity.dart';
+import 'package:teste_flutter/features/tables/helpers/edit_table_dialog_helper.dart';
 import 'package:teste_flutter/features/tables/stores/edit_table_customers_store.dart';
 import 'package:teste_flutter/features/tables/stores/edit_table_store.dart';
 
@@ -15,39 +15,22 @@ class EditTableDialog extends StatefulWidget {
 }
 
 class _EditTableDialogState extends State<EditTableDialog> {
-  TextEditingController _quantityController = TextEditingController();
-  final EditTableStore editTableStore = EditTableStore();
-  final EditTableCustomersStore customersStore = EditTableCustomersStore();
-
-  late ReactionDisposer _disposer;
+  late final EditTableDialogHelper _helper;
 
   @override
   void initState() {
     super.initState();
-    customersStore.setCustomers(widget.table.customers);
-    final initialQuantity = widget.table.customers.isNotEmpty ? widget.table.customers.length : 1;
-    editTableStore.setQuantity(initialQuantity);
-    _quantityController = TextEditingController(text: initialQuantity.toString());
-
-    _quantityController.addListener(() {
-      final value = int.tryParse(_quantityController.text) ?? 1;
-      editTableStore.setQuantity(value);
-    });
-
-    _disposer = reaction<int>(
-      (_) => editTableStore.quantity,
-      (value) {
-        if (_quantityController.text != value.toString()) {
-          _quantityController.text = value.toString();
-        }
-      },
+    _helper = EditTableDialogHelper(
+      table: widget.table,
+      editTableStore: EditTableStore(),
+      customersStore: EditTableCustomersStore(),
     );
+    _helper.initialize();
   }
 
   @override
   void dispose() {
-    _disposer();
-    _quantityController.dispose();
+    _helper.dispose();
     super.dispose();
   }
 
@@ -118,7 +101,7 @@ class _EditTableDialogState extends State<EditTableDialog> {
                 children: [
                   Expanded(
                     child: TextFormField(
-                      controller: _quantityController,
+                      controller: _helper.quantityController,
                       enabled: false,
                       style: const TextStyle(
                         color: Colors.black,
@@ -135,10 +118,11 @@ class _EditTableDialogState extends State<EditTableDialog> {
                   const SizedBox(width: 10),
                   IconButton(
                     onPressed: () {
-                      if (customersStore.customers.length > 1) {
+                      if (_helper.customersStore.customers.length > 1) {
                         setState(() {
-                          customersStore.removeLastCustomer();
-                          _quantityController.text = customersStore.customers.length.toString();
+                          _helper.customersStore.removeLastCustomer();
+                          _helper.quantityController.text =
+                              _helper.customersStore.customers.length.toString();
                         });
                       }
                     },
@@ -148,8 +132,9 @@ class _EditTableDialogState extends State<EditTableDialog> {
                   IconButton(
                     onPressed: () {
                       setState(() {
-                        customersStore.addCustomer();
-                        _quantityController.text = customersStore.customers.length.toString();
+                        _helper.customersStore.addCustomer();
+                        _helper.quantityController.text =
+                            _helper.customersStore.customers.length.toString();
                       });
                     },
                     icon: const Icon(Icons.add),
@@ -159,10 +144,10 @@ class _EditTableDialogState extends State<EditTableDialog> {
               const SizedBox(height: 20),
               Observer(
                 builder: (_) => ListView.builder(
-                  itemCount: customersStore.customers.length,
+                  itemCount: _helper.customersStore.customers.length,
                   shrinkWrap: true,
                   itemBuilder: (context, index) {
-                    final customer = customersStore.customers[index];
+                    final customer = _helper.customersStore.customers[index];
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 20),
                       child: Row(
@@ -170,7 +155,8 @@ class _EditTableDialogState extends State<EditTableDialog> {
                           Expanded(
                             child: TextField(
                               controller: TextEditingController(text: customer.name),
-                              onChanged: (value) => customersStore.updateCustomerName(index, value),
+                              onChanged: (value) =>
+                                  _helper.customersStore.updateCustomerName(index, value),
                               decoration: const InputDecoration(
                                 prefixIcon: Icon(Icons.person_outlined),
                                 labelText: 'Nome',
@@ -185,7 +171,7 @@ class _EditTableDialogState extends State<EditTableDialog> {
                             child: TextField(
                               controller: TextEditingController(text: customer.phone),
                               onChanged: (value) =>
-                                  customersStore.updateCustomerPhone(index, value),
+                                  _helper.customersStore.updateCustomerPhone(index, value),
                               decoration: const InputDecoration(
                                 prefixIcon: Icon(Icons.phone_outlined),
                                 labelText: 'Telefone',
