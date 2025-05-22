@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:teste_flutter/features/tables/entities/table.entity.dart';
+import 'package:teste_flutter/features/tables/stores/tables_store.dart';
 import 'package:teste_flutter/features/tables/widgets/customers_counter.widget.dart';
 import 'package:teste_flutter/features/tables/widgets/edit_table_dialog.dart';
 import 'package:teste_flutter/utils/extension_methos/material_extensions_methods.dart';
@@ -17,6 +19,8 @@ class TableCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tablesStore = Provider.of<TablesStore>(context);
+
     return Container(
       padding: const EdgeInsets.fromLTRB(_innerPadding, _topPadding, _innerPadding, _innerPadding),
       decoration: BoxDecoration(
@@ -28,7 +32,7 @@ class TableCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Center(
-            child: Text(('Mesa ${table.id}').toUpperCase(),
+            child: Text(('Mesa ${table.id + 1}').toUpperCase(),
                 style: context.textTheme.bodyMedium
                     ?.copyWith(color: context.appColors.green, fontWeight: FontWeight.w500)),
           ),
@@ -40,11 +44,15 @@ class TableCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(10),
             ),
             child: InkWell(
-              onTap: () {
-                showDialog(
+              onTap: () async {
+                final updatedTable = await showDialog(
                   context: context,
                   builder: (context) => EditTableDialog(tableEntity: table),
                 );
+
+                if (updatedTable != null) {
+                  tablesStore.updateTable(updatedTable);
+                }
               },
               child: Padding(
                 padding: const EdgeInsets.all(10),

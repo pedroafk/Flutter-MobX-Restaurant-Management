@@ -19,7 +19,7 @@ abstract class _TablesStoreBase with Store {
     final customerId = 1000 + random.nextInt(9000);
     tables.add(
       TableEntity(
-        id: tables.length + 1,
+        id: tables.length,
         identification: name,
         customers: [
           CustomerEntity(
@@ -30,5 +30,13 @@ abstract class _TablesStoreBase with Store {
         ],
       ),
     );
+  }
+
+  @action
+  void updateTable(TableEntity updatedTable) {
+    final index = tables.indexWhere((t) => t.id == updatedTable.id);
+    if (index != -1) {
+      tables[index] = updatedTable;
+    }
   }
 }

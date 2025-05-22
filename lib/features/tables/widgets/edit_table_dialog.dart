@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:teste_flutter/features/tables/entities/table.entity.dart';
 import 'package:teste_flutter/features/tables/helpers/edit_table_dialog_helper.dart';
-import 'package:teste_flutter/features/tables/stores/edit_table_customers_store.dart';
 import 'package:teste_flutter/features/tables/stores/edit_table_store.dart';
+import 'package:teste_flutter/features/tables/stores/tables_store.dart';
 
 class EditTableDialog extends StatefulWidget {
   const EditTableDialog({super.key, required this.tableEntity});
@@ -16,6 +16,7 @@ class EditTableDialog extends StatefulWidget {
 
 class _EditTableDialogState extends State<EditTableDialog> {
   late final EditTableDialogHelper _helper;
+  final tablesStore = TablesStore();
 
   @override
   void initState() {
@@ -23,7 +24,6 @@ class _EditTableDialogState extends State<EditTableDialog> {
     _helper = EditTableDialogHelper(
       table: widget.tableEntity,
       editTableStore: EditTableStore(),
-      customersStore: EditTableCustomersStore(),
     );
     _helper.initialize();
   }
@@ -73,6 +73,7 @@ class _EditTableDialogState extends State<EditTableDialog> {
                   labelText: 'Identificação da mesa',
                   border: OutlineInputBorder(),
                 ),
+                onChanged: _helper.editTableStore.setTableIdentifier,
               ),
               const SizedBox(height: 10),
               const Text(
@@ -119,11 +120,11 @@ class _EditTableDialogState extends State<EditTableDialog> {
                   const SizedBox(width: 10),
                   IconButton(
                     onPressed: () {
-                      if (_helper.customersStore.customers.length > 1) {
+                      if (_helper.editTableStore.customers.length > 1) {
                         setState(() {
-                          _helper.customersStore.removeLastCustomer();
+                          _helper.editTableStore.removeLastCustomer();
                           _helper.quantityController.text =
-                              _helper.customersStore.customers.length.toString();
+                              _helper.editTableStore.customers.length.toString();
                         });
                       }
                     },
@@ -133,9 +134,9 @@ class _EditTableDialogState extends State<EditTableDialog> {
                   IconButton(
                     onPressed: () {
                       setState(() {
-                        _helper.customersStore.addCustomer();
+                        _helper.editTableStore.addCustomer();
                         _helper.quantityController.text =
-                            _helper.customersStore.customers.length.toString();
+                            _helper.editTableStore.customers.length.toString();
                       });
                     },
                     icon: const Icon(Icons.add),
@@ -145,10 +146,10 @@ class _EditTableDialogState extends State<EditTableDialog> {
               const SizedBox(height: 20),
               Observer(
                 builder: (_) => ListView.builder(
-                  itemCount: _helper.customersStore.customers.length,
+                  itemCount: _helper.editTableStore.customers.length,
                   shrinkWrap: true,
                   itemBuilder: (context, index) {
-                    final customer = _helper.customersStore.customers[index];
+                    final customer = _helper.editTableStore.customers[index];
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 20),
                       child: Row(
@@ -157,7 +158,7 @@ class _EditTableDialogState extends State<EditTableDialog> {
                             child: TextField(
                               controller: TextEditingController(text: customer.name),
                               onChanged: (value) =>
-                                  _helper.customersStore.updateCustomerName(index, value),
+                                  _helper.editTableStore.updateCustomerName(index, value),
                               decoration: const InputDecoration(
                                 prefixIcon: Icon(Icons.person_outlined),
                                 labelText: 'Nome',
@@ -172,7 +173,7 @@ class _EditTableDialogState extends State<EditTableDialog> {
                             child: TextField(
                               controller: TextEditingController(text: customer.phone),
                               onChanged: (value) =>
-                                  _helper.customersStore.updateCustomerPhone(index, value),
+                                  _helper.editTableStore.updateCustomerPhone(index, value),
                               decoration: const InputDecoration(
                                 prefixIcon: Icon(Icons.phone_outlined),
                                 labelText: 'Telefone',
@@ -224,13 +225,17 @@ class _EditTableDialogState extends State<EditTableDialog> {
                           backgroundColor: const Color(0xFF1FB76C),
                         ),
                         child: const Text(
-                          'Criar',
+                          'Salvar',
                           style: TextStyle(
                             color: Colors.white,
                           ),
                         ),
                         onPressed: () {
-                          Navigator.of(context).pop();
+                          final updatedTable = widget.tableEntity.copyWith(
+                            customers: _helper.editTableStore.customers,
+                            identification: _helper.editTableStore.tableIdentifier,
+                          );
+                          Navigator.of(context).pop(updatedTable);
                         },
                       ),
                     ),
