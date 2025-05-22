@@ -51,7 +51,7 @@ class _EditTableDialogState extends State<EditTableDialog> {
                 mainAxisSize: MainAxisSize.max,
                 children: [
                   Text(
-                    'Editar informações da mesa ${widget.tableEntity.id}',
+                    'Editar informações da mesa ${widget.tableEntity.id + 1}',
                     style: const TextStyle(
                       fontWeight: FontWeight.normal,
                       fontSize: 20,
@@ -118,76 +118,78 @@ class _EditTableDialogState extends State<EditTableDialog> {
                     ),
                   ),
                   const SizedBox(width: 10),
-                  IconButton(
-                    onPressed: () {
-                      if (_helper.editTableStore.customers.length > 1) {
-                        setState(() {
+                  Observer(
+                    builder: (_) => IconButton(
+                      onPressed: () {
+                        if (_helper.editTableStore.customers.length > 1) {
                           _helper.editTableStore.removeLastCustomer();
                           _helper.quantityController.text =
                               _helper.editTableStore.customers.length.toString();
-                        });
-                      }
-                    },
-                    icon: const Icon(Icons.remove),
+                        }
+                      },
+                      icon: const Icon(Icons.remove),
+                    ),
                   ),
                   const SizedBox(width: 10),
-                  IconButton(
-                    onPressed: () {
-                      setState(() {
+                  Observer(
+                    builder: (_) => IconButton(
+                      onPressed: () {
                         _helper.editTableStore.addCustomer();
                         _helper.quantityController.text =
                             _helper.editTableStore.customers.length.toString();
-                      });
-                    },
-                    icon: const Icon(Icons.add),
+                      },
+                      icon: const Icon(Icons.add),
+                    ),
                   ),
                 ],
               ),
               const SizedBox(height: 20),
               Observer(
-                builder: (_) => ListView.builder(
-                  itemCount: _helper.editTableStore.customers.length,
-                  shrinkWrap: true,
-                  itemBuilder: (context, index) {
-                    final customer = _helper.editTableStore.customers[index];
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 20),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              controller: TextEditingController(text: customer.name),
-                              onChanged: (value) =>
-                                  _helper.editTableStore.updateCustomerName(index, value),
-                              decoration: const InputDecoration(
-                                prefixIcon: Icon(Icons.person_outlined),
-                                labelText: 'Nome',
-                                border: OutlineInputBorder(),
-                                contentPadding:
-                                    EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
+                builder: (_) {
+                  _helper.syncControllersWithCustomers(_helper.editTableStore.customers);
+                  return ListView.builder(
+                    itemCount: _helper.editTableStore.customers.length,
+                    shrinkWrap: true,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 20),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                controller: _helper.customerNameControllers[index],
+                                onChanged: (value) =>
+                                    _helper.editTableStore.updateCustomerName(index, value),
+                                decoration: const InputDecoration(
+                                  prefixIcon: Icon(Icons.person_outlined),
+                                  labelText: 'Nome',
+                                  border: OutlineInputBorder(),
+                                  contentPadding:
+                                      EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: TextField(
-                              controller: TextEditingController(text: customer.phone),
-                              onChanged: (value) =>
-                                  _helper.editTableStore.updateCustomerPhone(index, value),
-                              decoration: const InputDecoration(
-                                prefixIcon: Icon(Icons.phone_outlined),
-                                labelText: 'Telefone',
-                                border: OutlineInputBorder(),
-                                contentPadding:
-                                    EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: TextField(
+                                controller: _helper.customerPhoneControllers[index],
+                                onChanged: (value) =>
+                                    _helper.editTableStore.updateCustomerPhone(index, value),
+                                decoration: const InputDecoration(
+                                  prefixIcon: Icon(Icons.phone_outlined),
+                                  labelText: 'Telefone',
+                                  border: OutlineInputBorder(),
+                                  contentPadding:
+                                      EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
               ),
               const SizedBox(height: 20),
               const TextField(
