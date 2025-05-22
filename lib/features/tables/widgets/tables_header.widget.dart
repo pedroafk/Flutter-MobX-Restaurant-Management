@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 import 'package:teste_flutter/features/tables/stores/tables_store.dart';
 import 'package:teste_flutter/features/tables/widgets/create_table_dialog.dart';
@@ -11,6 +12,8 @@ class TablesHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final store = Provider.of<TablesStore>(context);
+
     return Padding(
       padding: const EdgeInsets.all(12.0),
       child: Align(
@@ -26,7 +29,12 @@ class TablesHeader extends StatelessWidget {
               onChanged: (value) => {},
             ),
             const SizedBox(width: 20),
-            const CustomersCounter(label: '{sum_customers}'),
+            Observer(
+              builder: (_) => CustomersCounter(
+                  label: store.tables.length == 1
+                      ? '${store.tables.length} mesa'
+                      : '${store.tables.length} mesas'),
+            ),
             const SizedBox(width: 20),
             FloatingActionButton(
               onPressed: () {
