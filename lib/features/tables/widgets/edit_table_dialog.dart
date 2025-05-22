@@ -52,7 +52,7 @@ class _EditTableDialogState extends State<EditTableDialog> {
                 mainAxisSize: MainAxisSize.max,
                 children: [
                   Text(
-                    'Editar informações da mesa ${widget.tableEntity.id + 1}',
+                    'Editar informações de ${widget.tableEntity.identification}',
                     style: const TextStyle(
                       fontWeight: FontWeight.normal,
                       fontSize: 20,
