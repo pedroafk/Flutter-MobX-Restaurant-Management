@@ -67,4 +67,12 @@ abstract class _EditTableStore with Store {
   void setTableIdentifier(String value) {
     tableIdentifier = value;
   }
+
+  @computed
+  bool get isSaveEnabled {
+    final hasTableIdentifier = tableIdentifier.trim().isNotEmpty;
+    final allNamesFilled = customers.every((c) => c.name.trim().isNotEmpty);
+    final allPhonesFilled = customers.every((c) => c.phone.trim().length == 15);
+    return hasTableIdentifier && allNamesFilled && allPhonesFilled;
+  }
 }

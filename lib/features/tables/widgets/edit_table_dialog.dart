@@ -4,6 +4,7 @@ import 'package:teste_flutter/features/tables/entities/table.entity.dart';
 import 'package:teste_flutter/features/tables/helpers/edit_table_dialog_helper.dart';
 import 'package:teste_flutter/features/tables/stores/edit_table_store.dart';
 import 'package:teste_flutter/features/tables/stores/tables_store.dart';
+import 'package:teste_flutter/features/tables/utils/phone_utils.dart';
 
 class EditTableDialog extends StatefulWidget {
   const EditTableDialog({super.key, required this.tableEntity});
@@ -172,17 +173,23 @@ class _EditTableDialogState extends State<EditTableDialog> {
                             const SizedBox(width: 10),
                             Expanded(
                               child: TextField(
-                                controller: _helper.customerPhoneControllers[index],
-                                onChanged: (value) =>
-                                    _helper.editTableStore.updateCustomerPhone(index, value),
-                                decoration: const InputDecoration(
-                                  prefixIcon: Icon(Icons.phone_outlined),
-                                  labelText: 'Telefone',
-                                  border: OutlineInputBorder(),
-                                  contentPadding:
-                                      EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
-                                ),
-                              ),
+                                  controller: _helper.customerPhoneControllers[index],
+                                  decoration: const InputDecoration(
+                                    prefixIcon: Icon(Icons.phone_outlined),
+                                    labelText: 'Telefone',
+                                    border: OutlineInputBorder(),
+                                    contentPadding:
+                                        EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
+                                  ),
+                                  onChanged: (value) {
+                                    String formatted = formatPhone(value);
+                                    _helper.customerPhoneControllers[index].value =
+                                        TextEditingValue(
+                                      text: formatted,
+                                      selection: TextSelection.collapsed(offset: formatted.length),
+                                    );
+                                    _helper.editTableStore.updateCustomerPhone(index, formatted);
+                                  }),
                             ),
                           ],
                         ),
@@ -226,19 +233,21 @@ class _EditTableDialogState extends State<EditTableDialog> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF1FB76C),
                         ),
+                        onPressed: _helper.editTableStore.isSaveEnabled
+                            ? () {
+                                final updatedTable = widget.tableEntity.copyWith(
+                                  customers: _helper.editTableStore.customers,
+                                  identification: _helper.editTableStore.tableIdentifier,
+                                );
+                                Navigator.of(context).pop(updatedTable);
+                              }
+                            : null,
                         child: const Text(
                           'Salvar',
                           style: TextStyle(
                             color: Colors.white,
                           ),
                         ),
-                        onPressed: () {
-                          final updatedTable = widget.tableEntity.copyWith(
-                            customers: _helper.editTableStore.customers,
-                            identification: _helper.editTableStore.tableIdentifier,
-                          );
-                          Navigator.of(context).pop(updatedTable);
-                        },
                       ),
                     ),
                   ),
