@@ -21,7 +21,7 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       scrollBehavior: const CustomScrollBehavior(),
       debugShowCheckedModeBanner: false,
-      title: 'Teste flutter- Alloy',
+      title: 'Gestão de mesas',
       theme: lightTheme(),
       home: const Scaffold(
         body: TablesPage(),
