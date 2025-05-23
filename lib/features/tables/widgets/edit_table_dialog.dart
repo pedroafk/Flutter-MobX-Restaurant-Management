@@ -199,15 +199,6 @@ class _EditTableDialogState extends State<EditTableDialog> {
                 },
               ),
               const SizedBox(height: 20),
-              const TextField(
-                keyboardType: TextInputType.name,
-                decoration: InputDecoration(
-                  labelText: 'Pesquisar cliente',
-                  prefixIcon: Icon(Icons.search),
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
